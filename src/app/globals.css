@@ -1,0 +1,250 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-inter: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+section[id] {
+  scroll-margin-top: 120px;
+}
+
+body {
+  color: #6B4F32;
+  background-color: #FAF7F0;
+  font-family: var(--font-inter);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #4A3523;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAF7F0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E2D3BC;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8B6F47;
+}
+
+/* Selection */
+::selection {
+  background-color: #4A3523;
+  color: #FAF7F0;
+}
+
+/* Print Utilities for Transparency & Financial Reports */
+@media print {
+  header, footer, .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+    color: black;
+  }
+}
+
+/* AASRA Initiative Animations */
+
+@keyframes aasraFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(35px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes aasraFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.aasra-fade-up {
+  animation: aasraFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.aasra-fade-up-delay-1 {
+  animation: aasraFadeUp 0.9s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.aasra-fade-up-delay-2 {
+  animation: aasraFadeUp 0.9s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.aasra-fade-up-delay-3 {
+  animation: aasraFadeUp 0.9s 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.aasra-image-zoom {
+  transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.group:hover .aasra-image-zoom {
+  transform: scale(1.1);
+}
+/* ================================
+   AASRA SECTION ANIMATIONS
+   ================================ */
+
+.aasra-fade-up {
+  animation: aasraFadeUp 0.8s ease-out both;
+}
+
+.aasra-fade-up-delay-1 {
+  animation: aasraFadeUp 0.8s ease-out 0.15s both;
+}
+
+.aasra-fade-up-delay-2 {
+  animation: aasraFadeUp 0.8s ease-out 0.3s both;
+}
+
+.aasra-image-zoom {
+  transform: scale(1.03);
+  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+article:hover .aasra-image-zoom {
+  transform: scale(1.1);
+}
+
+.about-reveal {
+  animation: aasraFadeUp 0.8s ease-out both;
+}
+
+.about-card {
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+.about-card:hover {
+  transform: translateY(-6px);
+}
+
+.impact-reveal {
+  animation: aasraFadeUp 0.8s ease-out both;
+}
+
+.impact-stat {
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+.impact-stat:hover {
+  transform: translateY(-5px);
+}
+
+.impact-number {
+  transition: transform 0.3s ease;
+}
+
+.impact-stat:hover .impact-number {
+  transform: translateX(4px);
+}
+
+.get-involved-reveal {
+  animation: aasraFadeUp 0.8s ease-out both;
+}
+
+.get-involved-line {
+  animation: lineReveal 1s ease-out both;
+}
+
+.involvement-card {
+  animation: cardReveal 0.7s ease-out both;
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+.involvement-card:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.involvement-card:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.involvement-card:hover {
+  transform: translateY(-8px);
+}
+
+.get-involved-cta {
+  animation: ctaReveal 0.8s ease-out both;
+}
+
+@keyframes aasraFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(35px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lineReveal {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+
+  to {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes cardReveal {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ctaReveal {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

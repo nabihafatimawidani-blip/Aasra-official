@@ -1,0 +1,329 @@
+// AASRA Social Welfare Organization - Relational Database Schema
+// Database Provider: PostgreSQL (or SQLite/Prisma compatible)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Roles for Admin RBAC
+enum Role {
+  SUPER_ADMIN
+  FINANCE_ADMIN
+  CONTENT_ADMIN
+  OUTREACH_ADMIN
+  MEMBER
+}
+
+// Initiative Status
+enum InitiativeStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+  PLANNED
+}
+
+// Programmatic Categories
+enum InitiativeCategory {
+  EDUCATION
+  CHILD_WELFARE
+  MENTAL_WELLBEING
+  AWARENESS
+  DONATIONS
+  RECREATIONAL
+  COMMUNITY_OUTREACH
+  HEALTHCARE
+  OTHER
+}
+
+// Financial Transaction Type
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+// Financial Categories
+enum TransactionCategory {
+  INDIVIDUAL_DONATION
+  COMMUNITY_COLLECTION
+  INSTITUTIONAL_GRANT
+  EDUCATION_SUPPLIES
+  NUTRITION_AND_FOOD
+  HEALTHCARE_AND_HYGIENE
+  LOGISTICS_AND_TRANSPORT
+  EVENT_ORGANIZATION
+  PRINTING_AND_MATERIALS
+  MISCELLANEOUS
+}
+
+// Transaction Status
+enum TransactionStatus {
+  VERIFIED
+  PENDING_AUDIT
+  FLAGGED
+}
+
+// Volunteer Application Review Status
+enum VolunteerStatus {
+  PENDING
+  UNDER_REVIEW
+  INTERVIEW_SCHEDULED
+  ACCEPTED
+  REJECTED
+}
+
+// Contact Inquiries Status
+enum MessageStatus {
+  UNREAD
+  READ
+  IN_PROGRESS
+  RESOLVED
+}
+
+// Partner Organization Classification
+enum PartnerType {
+  NGO
+  ORPHANAGE
+  GOVERNMENT_SCHOOL
+  COMMUNITY_SHELTER
+  CORPORATE_SPONSOR
+  COLLEGE_DEPARTMENT
+}
+
+// ----------------------------------------------------
+// Core Organization Models
+// ----------------------------------------------------
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String
+  name          String
+  role          Role      @default(MEMBER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  auditLogs     AuditLog[]
+
+  @@index([email])
+}
+
+model Founder {
+  id          String   @id @default(uuid())
+  name        String
+  position    String
+  bio         String
+  academicYear String
+  department  String
+  photoUrl    String?
+  linkedinUrl String?
+  email       String?
+  displayOrder Int     @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TeamMember {
+  id          String   @id @default(uuid())
+  name        String
+  role        String
+  department  String   // e.g., "Executive", "Finance", "Outreach", "Events", "Media & Tech"
+  tier        String   @default("MEMBER") // e.g., "GOVERNING_BODY", "CORE_TEAM", "VOLUNTEER"
+  bio         String?
+  photoUrl    String?
+  linkedinUrl String?
+  email       String?
+  active      Boolean  @default(true)
+  joinedYear  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([department, tier])
+}
+
+// ----------------------------------------------------
+// Initiatives & Programs
+// ----------------------------------------------------
+
+model Initiative {
+  id                 String              @id @default(uuid())
+  slug               String              @unique
+  title              String
+  category           InitiativeCategory
+  status             InitiativeStatus    @default(ONGOING)
+  shortDescription   String
+  fullDescription    String
+  location           String
+  startDate          DateTime
+  endDate            DateTime?
+  coverImageUrl      String?
+  beneficiariesCount Int                 @default(0)
+  volunteersCount    Int                 @default(0)
+  budgetAllocated    Decimal             @default(0.0) @db.Decimal(10, 2)
+  amountSpent        Decimal             @default(0.0) @db.Decimal(10, 2)
+  featured           Boolean             @default(false)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  // Relationships
+  events             Event[]
+  galleryItems       GalleryItem[]
+  transactions       Transaction[]
+
+  @@index([category, status])
+  @@index([slug])
+}
+
+model Event {
+  id           String      @id @default(uuid())
+  title        String
+  description  String
+  date         DateTime
+  venue        String
+  initiativeId String?
+  initiative   Initiative? @relation(fields: [initiativeId], references: [id], onDelete: SetNull)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([date])
+  @@index([initiativeId])
+}
+
+model GalleryItem {
+  id           String              @id @default(uuid())
+  title        String
+  caption      String?
+  imageUrl     String
+  category     InitiativeCategory
+  eventDate    DateTime
+  initiativeId String?
+  initiative   Initiative?         @relation(fields: [initiativeId], references: [id], onDelete: SetNull)
+  createdAt    DateTime            @default(now())
+
+  @@index([category])
+  @@index([initiativeId])
+}
+
+model Partner {
+  id                 String      @id @default(uuid())
+  name               String
+  type               PartnerType
+  logoUrl            String?
+  description        String
+  websiteUrl         String?
+  collaborationScope String
+  active             Boolean     @default(true)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  @@index([type])
+}
+
+// ----------------------------------------------------
+// Financial Transparency & Donations
+// ----------------------------------------------------
+
+model Donation {
+  id            String         @id @default(uuid())
+  receiptNo     String         @unique
+  donorName     String         // "Anonymous" supported
+  donorEmail    String?
+  amount        Decimal        @db.Decimal(10, 2)
+  date          DateTime       @default(now())
+  paymentMethod String         @default("UPI_DIRECT_TRANSFER")
+  notes         String?
+  createdAt     DateTime       @default(now())
+
+  transaction   Transaction?
+
+  @@index([receiptNo])
+}
+
+model Transaction {
+  id            String              @id @default(uuid())
+  referenceId   String              @unique
+  date          DateTime
+  type          TransactionType
+  category      TransactionCategory
+  description   String
+  amount        Decimal             @db.Decimal(10, 2)
+  paymentMethod String
+  status        TransactionStatus   @default(VERIFIED)
+  voucherUrl    String?
+
+  initiativeId  String?
+  initiative    Initiative?         @relation(fields: [initiativeId], references: [id], onDelete: SetNull)
+
+  donationId    String?             @unique
+  donation      Donation?           @relation(fields: [donationId], references: [id], onDelete: SetNull)
+
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@index([type, category])
+  @@index([date])
+  @@index([initiativeId])
+}
+
+// ----------------------------------------------------
+// Applications & Inquiries
+// ----------------------------------------------------
+
+model VolunteerApplication {
+  id             String          @id @default(uuid())
+  fullName       String
+  email          String
+  phone          String
+  collegeDept    String
+  academicYear   String
+  interests      String[]        // Stored as text array or comma-separated string
+  availability   String          // e.g. "Weekends (4-6 hrs)", "Flexible"
+  statement      String          // Why they wish to join AASRA
+  status         VolunteerStatus @default(PENDING)
+  internalNotes  String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([status])
+  @@index([email])
+}
+model ContactMessage {
+  id         String        @id @default(uuid())
+  name       String
+  email      String
+  subject    String
+  message    String
+  status     MessageStatus @default(UNREAD)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([status]) 
+}
+
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  entity    String
+  entityId  String
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  metadata  Json?
+  timestamp DateTime @default(now())
+
+  @@index([action, entity])
+}
+model ApiRateLimit {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  windowStart DateTime
+  requestCount Int     @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([windowStart])
+}
