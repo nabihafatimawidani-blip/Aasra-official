@@ -106,7 +106,7 @@ export const Navbar: React.FC = () => {
             </span>
             <span className="text-brand-600 hidden sm:inline">•</span>
             <span className="text-brand-300 hidden sm:inline">
-              Student-Led College Social Welfare & Community Outreach
+              Sreyas Institute of Engineering and Technology
             </span>
           </div>
 
@@ -138,8 +138,8 @@ export const Navbar: React.FC = () => {
                   Welfare Initiative
                 </span>
               </div>
-              <span className="text-xs text-brand-500 font-medium tracking-wide">
-                Nurturing Hope • Empowering Communities
+              <span className="text-[11px] text-brand-600 font-medium tracking-normal leading-tight mt-0.5">
+                Sreyas Institute of Engineering and Technology
               </span>
             </div>
           </Link>

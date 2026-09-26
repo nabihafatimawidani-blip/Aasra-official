@@ -60,18 +60,19 @@ export const Footer: React.FC = () => {
               </div>
               <div>
                 <span className="text-lg font-bold text-white tracking-tight">AASRA</span>
+                <p className="text-xs text-gold-400/90 font-medium">Sreyas Institute of Engineering and Technology</p>
                 <p className="text-xs text-brand-300">Student Social Welfare & Community Outreach</p>
               </div>
             </div>
 
             <p className="text-sm text-brand-200 leading-relaxed pr-4">
-              AASRA is an officially recognized, student-led college social welfare initiative dedicated to uplifting underprivileged children and vulnerable communities through remedial education, emotional well-being, health awareness, and transparent community drives.
+              AASRA is an officially recognized, student-led social welfare initiative at Sreyas Institute of Engineering and Technology, dedicated to uplifting underprivileged children and vulnerable communities through remedial education, emotional well-being, health awareness, and transparent community drives.
             </p>
 
             <div className="pt-2 text-xs text-brand-300 space-y-1">
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-gold-400/80 shrink-0 mt-0.5" />
-                <span>Student Welfare Office, Room #204, Campus Activity Centre</span>
+                <span>Student Welfare Office, Room #204, Campus Activity Centre, Sreyas Institute of Engineering and Technology</span>
               </div>
               <div className="flex items-center gap-2">
   <Mail className="w-4 h-4 text-gold-400/80 shrink-0" />
@@ -182,7 +183,7 @@ export const Footer: React.FC = () => {
         {/* Legal & Governance Bottom Bar */}
         <div className="mt-12 pt-6 border-t border-brand-800/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-brand-400">
           <div>
-            © {new Date().getFullYear()} AASRA Student Social Welfare Organization. Official campus institutional portal.
+            © {new Date().getFullYear()} AASRA • Sreyas Institute of Engineering and Technology. Official campus institutional portal.
           </div>
           <div className="flex items-center gap-6">
             <span>Student Affairs Advisory Charter</span>

@@ -23,9 +23,9 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 
 export const metadata = {
-  title: 'About AASRA | Motive, Story, Founders, Vision & Mission',
+  title: 'About AASRA | Sreyas Institute of Engineering and Technology',
   description:
-    'Learn about AASRA, an official student-led college social welfare organization: our motive, founding story, student founders, vision, mission, and core values.',
+    'Learn about AASRA, an official student-led social welfare organization at Sreyas Institute of Engineering and Technology: our motive, founding story, student founders, vision, mission, and core values.',
 };
 
 export default function AboutPage() {
@@ -37,7 +37,7 @@ export default function AboutPage() {
           <div className="max-w-3xl space-y-4">
             <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gold-400 bg-brand-800/80 px-3 py-1 rounded-full border border-brand-700">
               <Building className="w-3.5 h-3.5" />
-              <span>Official Institutional Profile</span>
+              <span>Sreyas Institute of Engineering and Technology • Official Profile</span>
             </div>
             <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
               About AASRA
@@ -169,7 +169,7 @@ export default function AboutPage() {
                 <span className="text-xs font-bold text-gold-800 bg-gold-100 px-2 py-0.5 rounded">Phase 3: Institutional Approval</span>
                 <h4 className="text-base font-bold text-brand-800 mt-1">College Recognition & NGO Partnerships</h4>
                 <p className="text-xs text-brand-600 mt-1">
-                  The college student welfare board formally ratified AASRA as an official student body, granting access to activity hall spaces and providing formal affiliation with local child care centers.
+                  The student welfare board at Sreyas Institute of Engineering and Technology formally ratified AASRA as an official student body, granting access to activity hall spaces and providing formal affiliation with local child care centers.
                 </p>
               </div>
               <div className="absolute left-2.5 sm:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-gold-600 border-4 border-white shadow"></div>
