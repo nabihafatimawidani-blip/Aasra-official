@@ -240,6 +240,35 @@ async function main() {
     });
   }
   console.log('✅ Seeded initiatives');
+
+  // =========================
+  // ADMIN USER
+  // =========================
+  const adminEmail = (process.env.ADMIN_EMAIL || 'aasrasreyas@gmail.com').toLowerCase();
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: adminEmail },
+  });
+
+  if (!existingAdmin) {
+    let passwordHash = "$2b$12$CzI2C7MVMxOFqZ8I4mgFTuU/mVZwueC8mW6nZ66iBSqCilXpZDB1e";
+    if (process.env.ADMIN_PASSWORD) {
+      const bcrypt = require('bcryptjs');
+      passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 12);
+    }
+    await prisma.user.create({
+      data: {
+        id: "f180e58e-f607-464b-87db-a341f10b1b40",
+        name: "Nabiha Fatima",
+        email: adminEmail,
+        role: 'SUPER_ADMIN',
+        passwordHash,
+      },
+    });
+    console.log('✅ Seeded super admin user');
+  } else {
+    console.log('ℹ️ Admin user already exists, keeping existing credentials');
+  }
+
 }
 
 main()
