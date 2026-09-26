@@ -1,6 +1,11 @@
 import type { NextAuthConfig } from "next-auth";
 
 export default {
+  secret:
+    process.env.AUTH_SECRET ||
+    process.env.NEXTAUTH_SECRET ||
+    process.env.ADMIN_SECRET_KEY,
+
   pages: {
     signIn: "/admin/login",
   },

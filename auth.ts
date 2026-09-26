@@ -8,6 +8,10 @@ import { checkRateLimit } from "./src/lib/rate-limit";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
+  secret:
+    process.env.AUTH_SECRET ||
+    process.env.NEXTAUTH_SECRET ||
+    process.env.ADMIN_SECRET_KEY,
 
   providers: [
     Credentials({

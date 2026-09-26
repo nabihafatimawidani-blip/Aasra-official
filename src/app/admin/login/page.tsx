@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { AuthError } from "next-auth";
+import { redirect } from "next/navigation";
 import { signIn } from "../../../../auth";
 
 export const metadata: Metadata = {
@@ -9,8 +11,14 @@ export const metadata: Metadata = {
   },
 };
 
+export default async function AdminLoginPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ error?: string }>;
+}) {
+  const resolvedParams = searchParams ? await searchParams : undefined;
+  const error = resolvedParams?.error;
 
-export default function AdminLoginPage() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-[#f5f0e8] px-6">
       <div className="w-full max-w-md rounded-2xl border border-[#d8c8b5] bg-white p-8 shadow-lg">
@@ -24,15 +32,30 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
+        {error && (
+          <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-3 text-center text-xs font-semibold text-red-700">
+            {error === "CredentialsSignin"
+              ? "Invalid email or password."
+              : "Authentication failed. Please verify your credentials."}
+          </div>
+        )}
+
         <form
           action={async (formData) => {
             "use server";
 
-            await signIn("credentials", {
-              email: formData.get("email"),
-              password: formData.get("password"),
-              redirectTo: "/admin",
-            });
+            try {
+              await signIn("credentials", {
+                email: formData.get("email"),
+                password: formData.get("password"),
+                redirectTo: "/admin",
+              });
+            } catch (err) {
+              if (err instanceof AuthError) {
+                redirect("/admin/login?error=CredentialsSignin");
+              }
+              throw err;
+            }
           }}
           className="space-y-5"
         >
