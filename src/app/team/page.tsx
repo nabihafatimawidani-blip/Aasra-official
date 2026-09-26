@@ -21,8 +21,9 @@ const leadershipPhotos: Record<string, string> = {
   'Volunteer Coordinator': '/team/volunteer.jpeg',
   'Media & Marketing': '/team/media-marketing.jpeg',
   'Media Secretary': '/team/media sec.jpeg',
-  'Treasurer': '/team/treasurer.jpeg',
+  Treasurer: '/team/treasurer.jpeg',
 };
+
 type TeamMember = {
   id: string;
   name: string;
@@ -34,15 +35,131 @@ type TeamMember = {
   linkedinUrl: string | null;
   joinedYear: string;
 };
+
+const FALLBACK_TEAM_MEMBERS: TeamMember[] = [
+  {
+    id: 'team-president',
+    name: 'Miryala Pragnya',
+    role: 'President',
+    department: 'Executive Board',
+    tier: 'GOVERNING_BODY',
+    bio: 'Leads strategic initiatives, institutional partnerships, and college council coordination.',
+    photoUrl: '/team/president.jpeg',
+    linkedinUrl: null,
+    joinedYear: '2025',
+  },
+  {
+    id: 'team-vice-president',
+    name: 'Nabiha Fatima',
+    role: 'Vice President',
+    department: 'Executive Board',
+    tier: 'GOVERNING_BODY',
+    bio: 'Supports the President and oversees major organizational operations and student activities.',
+    photoUrl: '/team/vp1.jpeg',
+    linkedinUrl: null,
+    joinedYear: '2025',
+  },
+  {
+    id: 'team-general-secretary',
+    name: 'Yamini Mogullapally',
+    role: 'General Secretary',
+    department: 'Secretarial Team',
+    tier: 'GOVERNING_BODY',
+    bio: 'Coordinates documentation, communication, and organizational administration.',
+    photoUrl: '/team/general sec.jpeg',
+    linkedinUrl: null,
+    joinedYear: '2025',
+  },
+  {
+    id: 'team-joint-secretary',
+    name: 'Anagha Gundamraju',
+    role: 'Joint Secretary',
+    department: 'Secretarial Team',
+    tier: 'GOVERNING_BODY',
+    bio: 'Supports the General Secretary and assists with organizational coordination.',
+    photoUrl: '/team/joint sec.jpeg',
+    linkedinUrl: null,
+    joinedYear: '2025',
+  },
+  {
+    id: 'team-welfare-coordinator',
+    name: 'Khudsia',
+    role: 'Welfare Coordinator',
+    department: 'Welfare & Outreach',
+    tier: 'GOVERNING_BODY',
+    bio: 'Coordinates student welfare, outreach activities, and community support initiatives.',
+    photoUrl: '/team/welfare sec.jpeg',
+    linkedinUrl: null,
+    joinedYear: '2025',
+  },
+  {
+    id: 'team-event-planning',
+    name: 'G. Meghana Sree',
+    role: 'Event & Planning Coordinator',
+    department: 'Events & Planning',
+    tier: 'GOVERNING_BODY',
+    bio: 'Plans and coordinates AASRA events, activities, and student engagement programs.',
+    photoUrl: '/team/event-managment.jpeg',
+    linkedinUrl: null,
+    joinedYear: '2025',
+  },
+  {
+    id: 'team-volunteer-coordinator',
+    name: 'M. Jayanth',
+    role: 'Volunteer Coordinator',
+    department: 'Volunteer Management',
+    tier: 'GOVERNING_BODY',
+    bio: 'Coordinates volunteers and supports the execution of AASRA initiatives.',
+    photoUrl: '/team/volunteer.jpeg',
+    linkedinUrl: null,
+    joinedYear: '2025',
+  },
+  {
+    id: 'team-media-marketing',
+    name: 'Kakani Naga Sai Haritha',
+    role: 'Media & Marketing',
+    department: 'Media & Communications',
+    tier: 'GOVERNING_BODY',
+    bio: 'Handles media communication, outreach, promotional activities, and AASRA’s public presence.',
+    photoUrl: '/team/media-marketing.jpeg',
+    linkedinUrl: null,
+    joinedYear: '2025',
+  },
+  {
+    id: 'team-media-secretary',
+    name: 'Goli Yashwasin',
+    role: 'Media Secretary',
+    department: 'Media & Communications',
+    tier: 'GOVERNING_BODY',
+    bio: 'Supports media communication, outreach, promotional activities, and AASRA’s public presence.',
+    photoUrl: '/team/media sec.jpeg',
+    linkedinUrl: null,
+    joinedYear: '2025',
+  },
+  {
+    id: 'team-treasurer',
+    name: 'Bondili Keerthana',
+    role: 'Treasurer',
+    department: 'Finance',
+    tier: 'GOVERNING_BODY',
+    bio: 'Supports financial coordination and transparent management of organizational funds.',
+    photoUrl: '/team/treasurer.jpeg',
+    linkedinUrl: null,
+    joinedYear: '2025',
+  },
+];
+
 function MemberCard({
   member,
 }: {
   member: TeamMember;
 }) {
-  const photo =
-  member.role === 'Volunteer Coordinator'
-    ? '/team/volunteer.jpeg'
-    : leadershipPhotos[member.role];
+  const rawPhoto =
+    leadershipPhotos[member.role] ||
+    member.photoUrl ||
+    (member.role === 'Volunteer Coordinator' ? '/team/volunteer.jpeg' : null);
+
+  const photo = rawPhoto ? encodeURI(rawPhoto) : null;
 
   return (
     <Card
@@ -85,9 +202,11 @@ function MemberCard({
         </div>
 
         {/* Bio */}
-        <p className="text-xs text-brand-700 leading-relaxed text-center pt-3 border-t border-brand-100">
-          {member.bio}
-        </p>
+        {member.bio && (
+          <p className="text-xs text-brand-700 leading-relaxed text-center pt-3 border-t border-brand-100">
+            {member.bio}
+          </p>
+        )}
       </div>
 
       {/* Member Status */}
@@ -105,64 +224,72 @@ function MemberCard({
 }
 
 export default async function TeamPage() {
-  const teamMembers = await prisma.teamMember.findMany({
-  where: {
-    active: true,
-  },
-  select: {
-    id: true,
-    name: true,
-    role: true,
-    department: true,
-    tier: true,
-    bio: true,
-    photoUrl: true,
-    linkedinUrl: true,
-    joinedYear: true,
-  },
-  orderBy: {
-    createdAt: 'asc',
-  },
-});
-  const president = teamMembers.find(
-    (member) => member.role === 'President'
+  let teamMembers: TeamMember[] = [];
+
+  try {
+    teamMembers = await prisma.teamMember.findMany({
+      where: {
+        active: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        role: true,
+        department: true,
+        tier: true,
+        bio: true,
+        photoUrl: true,
+        linkedinUrl: true,
+        joinedYear: true,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching team members from database:', error);
+  }
+
+  const members =
+    teamMembers && teamMembers.length > 0
+      ? teamMembers
+      : FALLBACK_TEAM_MEMBERS;
+
+  const president = members.find((member) => member.role === 'President');
+
+  const vicePresidents = members.filter(
+    (member) =>
+      member.role === 'Vice President' ||
+      member.role.toLowerCase().includes('vice president')
   );
 
-  const vicePresident = teamMembers.find(
-    (member) => member.role === 'Vice President'
+  const secretaries = members.filter(
+    (member) =>
+      member.role === 'General Secretary' ||
+      member.role === 'Joint Secretary'
   );
 
- const secretaries = teamMembers.filter(
-  (member) =>
-    member.role === 'General Secretary' ||
-    member.role === 'Joint Secretary'
-);
+  const coordinators = members.filter(
+    (member) =>
+      member.role === 'Welfare Coordinator' ||
+      member.role === 'Event & Planning Coordinator' ||
+      member.role === 'Volunteer Coordinator'
+  );
 
-const coordinators = teamMembers.filter(
-  (member) =>
-    member.role === 'Welfare Coordinator' ||
-    member.role === 'Event & Planning Coordinator' ||
-    member.role === 'Volunteer Coordinator'
-);
+  const mediaMarketing = members.filter(
+    (member) =>
+      member.role === 'Media & Marketing' ||
+      member.role === 'Media Secretary'
+  );
 
-const mediaMarketing = teamMembers.filter(
-  (member) =>
-    member.role === 'Media & Marketing' ||
-    member.role === 'Media Secretary'
-);
-
-const treasurer = teamMembers.find(
-  (member) => member.role === 'Treasurer'
-);
+  const treasurer = members.find((member) => member.role === 'Treasurer');
 
   return (
     <div className="space-y-16 py-12 pb-20">
-
       {/* Banner */}
       <section className="bg-brand-900 text-white py-14 border-b border-brand-800 -mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl space-y-4">
-
             <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gold-400 bg-brand-800/80 px-3 py-1 rounded-full border border-brand-700">
               <Users className="w-3.5 h-3.5" />
               <span>STUDENT WELFARE LEADERSHIP</span>
@@ -177,7 +304,6 @@ const treasurer = teamMembers.find(
               meaningful opportunities for education, well-being, and community
               support. Meet the student leaders guiding the initiative.
             </p>
-
           </div>
         </div>
       </section>
@@ -203,9 +329,19 @@ const treasurer = teamMembers.find(
           description="The core leadership responsible for guiding AASRA and coordinating its major initiatives."
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto mt-10">
+        <div
+          className={`grid grid-cols-1 gap-6 mx-auto mt-10 ${
+            vicePresidents.length > 2
+              ? 'sm:grid-cols-2 lg:grid-cols-4 max-w-6xl'
+              : vicePresidents.length === 2
+                ? 'sm:grid-cols-3 max-w-4xl'
+                : 'sm:grid-cols-2 max-w-3xl'
+          }`}
+        >
           {president && <MemberCard member={president} />}
-          {vicePresident && <MemberCard member={vicePresident} />}
+          {vicePresidents.map((vp) => (
+            <MemberCard key={vp.id} member={vp} />
+          ))}
         </div>
       </section>
 
@@ -238,20 +374,22 @@ const treasurer = teamMembers.find(
           ))}
         </div>
       </section>
-      {/* MEDIA & MARKETING */}
-<section className="py-16">
-  <SectionHeader
-    pretitle="MEDIA & COMMUNICATIONS"
-    title="Media & Marketing"
-    description="Responsible for media communication, outreach, promotional activities, and AASRA’s public presence."
-  />
 
-  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto mt-10">
-  {mediaMarketing.map((member) => (
-    <MemberCard key={member.id} member={member} />
-  ))}
-</div>
-</section>
+      {/* MEDIA & MARKETING */}
+      <section className="py-16">
+        <SectionHeader
+          pretitle="MEDIA & COMMUNICATIONS"
+          title="Media & Marketing"
+          description="Responsible for media communication, outreach, promotional activities, and AASRA’s public presence."
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto mt-10">
+          {mediaMarketing.map((member) => (
+            <MemberCard key={member.id} member={member} />
+          ))}
+        </div>
+      </section>
+
       {/* TREASURER */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeader
@@ -272,7 +410,6 @@ const treasurer = teamMembers.find(
       {/* Leadership Statement */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg border border-brand-200/80 p-8 sm:p-10 text-center shadow-sm">
-
           <div className="w-12 h-12 rounded-full bg-brand-50 text-brand-800 flex items-center justify-center mx-auto border border-brand-200">
             <Users className="w-6 h-6 text-gold-600" />
           </div>
@@ -287,10 +424,8 @@ const treasurer = teamMembers.find(
             student community to plan and carry out meaningful welfare
             activities.
           </p>
-
         </div>
       </section>
-
     </div>
   );
 }
